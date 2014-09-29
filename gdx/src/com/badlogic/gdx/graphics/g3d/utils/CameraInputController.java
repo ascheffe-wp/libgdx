@@ -74,9 +74,11 @@ public class CameraInputController extends GestureDetector {
 	private final Vector3 tmpV1 = new Vector3();
 	private final Vector3 tmpV2 = new Vector3();
 
-	protected static class CameraGestureListener extends GestureAdapter {
+    public float oldZoom;
+
+	public static class CameraGestureListener extends GestureAdapter {
 		public CameraInputController controller;
-		private float previousZoom;
+		public float previousZoom;
 
 		@Override
 		public boolean touchDown (float x, float y, int pointer, int button) {
@@ -119,9 +121,9 @@ public class CameraInputController extends GestureDetector {
 		}
 	};
 
-	protected final CameraGestureListener gestureListener;
+	public final CameraGestureListener gestureListener;
 
-	protected CameraInputController (final CameraGestureListener gestureListener, final Camera camera) {
+	public CameraInputController (final CameraGestureListener gestureListener, final Camera camera) {
 		super(gestureListener);
 		this.gestureListener = gestureListener;
 		this.gestureListener.controller = this;
@@ -208,6 +210,7 @@ public class CameraInputController extends GestureDetector {
 	}
 
 	public boolean zoom (float amount) {
+        oldZoom = amount;
 		if (!alwaysScroll && activateKey != 0 && !activatePressed) return false;
 		camera.translate(tmpV1.set(camera.direction).scl(amount));
 		if (scrollTarget) target.add(tmpV1);
@@ -215,7 +218,7 @@ public class CameraInputController extends GestureDetector {
 		return true;
 	}
 
-	protected boolean pinchZoom (float amount) {
+	public boolean pinchZoom (float amount) {
 		return zoom(pinchZoomFactor * amount);
 	}
 

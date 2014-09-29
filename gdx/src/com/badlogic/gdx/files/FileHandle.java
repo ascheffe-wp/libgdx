@@ -701,4 +701,8 @@ public class FileHandle {
 				copyFile(srcFile, destFile);
 		}
 	}
+
+    public void setType(FileType type) {
+        this.type = type;
+    }
 }

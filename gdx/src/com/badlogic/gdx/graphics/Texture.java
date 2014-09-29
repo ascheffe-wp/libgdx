@@ -142,7 +142,7 @@ public class Texture extends GLTexture {
 	@Override
 	protected void reload () {
 		if (!isManaged()) throw new GdxRuntimeException("Tried to reload unmanaged Texture");
-		glHandle = createGLHandle();
+		setGlHandle2(createGLHandle());
 		load(data);
 	}
 
@@ -190,7 +190,7 @@ public class Texture extends GLTexture {
 		// reloaded through the asset manager as we first remove (and thus dispose) the texture
 		// and then reload it. the glHandle is set to 0 in invalidateAllTextures prior to
 		// removal from the asset manager.
-		if (glHandle == 0) return;
+		if (getGlHandle2() == 0) return;
 		delete();
 		if (data.isManaged()) if (managedTextures.get(Gdx.app) != null) managedTextures.get(Gdx.app).removeValue(this, true);
 	}
@@ -237,7 +237,7 @@ public class Texture extends GLTexture {
 					// already reloaded textures.
 					final int refCount = assetManager.getReferenceCount(fileName);
 					assetManager.setReferenceCount(fileName, 0);
-					texture.glHandle = 0;
+					texture.setGlHandle2(0);
 
 					// create the parameters, passing the reference to the texture as
 					// well as a callback that sets the ref count.
@@ -258,8 +258,8 @@ public class Texture extends GLTexture {
 
 					// unload the texture, create a new gl handle then reload it.
 					assetManager.unload(fileName);
-					texture.glHandle = Texture.createGLHandle();
-					assetManager.load(fileName, Texture.class, params);
+					texture.setGlHandle2(Texture.createGLHandle());
+					assetManager.load(fileName, Texture.class, params, null);
 				}
 			}
 			managedTextureArray.clear();

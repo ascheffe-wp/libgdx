@@ -33,6 +33,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -282,14 +283,14 @@ public class AssetManager implements Disposable {
 	 * @param fileName the file name (interpretation depends on {@link AssetLoader})
 	 * @param type the type of the asset. */
 	public synchronized <T> void load (String fileName, Class<T> type) {
-		load(fileName, type, null);
+		load(fileName, type, null, null);
 	}
 
 	/** Adds the given asset to the loading queue of the AssetManager.
 	 * @param fileName the file name (interpretation depends on {@link AssetLoader})
 	 * @param type the type of the asset.
 	 * @param parameter parameters for the AssetLoader. */
-	public synchronized <T> void load (String fileName, Class<T> type, AssetLoaderParameters<T> parameter) {
+	public synchronized <T> void load (String fileName, Class<T> type, AssetLoaderParameters<T> parameter, FileHandle fh) {
 		AssetLoader loader = getLoader(type, fileName);
 		if (loader == null) throw new GdxRuntimeException("No loader for type: " + ClassReflection.getSimpleName(type));
 
@@ -327,6 +328,9 @@ public class AssetManager implements Disposable {
 
 		toLoad++;
 		AssetDescriptor assetDesc = new AssetDescriptor(fileName, type, parameter);
+        if(fh != null) {
+            assetDesc.file = fh;
+        }
 		loadQueue.add(assetDesc);
 		log.debug("Queued: " + assetDesc);
 	}
@@ -334,7 +338,7 @@ public class AssetManager implements Disposable {
 	/** Adds the given asset to the loading queue of the AssetManager.
 	 * @param desc the {@link AssetDescriptor} */
 	public synchronized void load (AssetDescriptor desc) {
-		load(desc.fileName, desc.type, desc.params);
+		load(desc.fileName, desc.type, desc.params, desc.file);
 	}
 
 	/** Disposes the given asset and all its dependencies recursively, depth first.

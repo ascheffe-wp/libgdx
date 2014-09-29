@@ -143,7 +143,7 @@ public class Cubemap extends GLTexture {
 	@Override
 	protected void reload () {
 		if (!isManaged()) throw new GdxRuntimeException("Tried to reload an unmanaged Cubemap");
-		glHandle = createGLHandle();
+		setGlHandle2(createGLHandle());
 		load(data[CubemapSide.PositiveX.index], data[CubemapSide.NegativeX.index], data[CubemapSide.PositiveY.index],
 			data[CubemapSide.NegativeY.index], data[CubemapSide.PositiveZ.index], data[CubemapSide.NegativeZ.index]);
 	}

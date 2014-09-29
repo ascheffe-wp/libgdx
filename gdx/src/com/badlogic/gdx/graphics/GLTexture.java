@@ -41,7 +41,7 @@ public abstract class GLTexture implements Disposable {
 
 	/** The target of this texture, used when binding the texture, e.g. GL_TEXTURE_2D */
 	public final int glTarget;
-	protected int glHandle;
+	private int glHandle2;
 	protected TextureFilter minFilter = TextureFilter.Nearest;
 	protected TextureFilter magFilter = TextureFilter.Nearest;
 	protected TextureWrap uWrap = TextureWrap.ClampToEdge;
@@ -63,7 +63,7 @@ public abstract class GLTexture implements Disposable {
 
 	public GLTexture (int glTarget, int glHandle) {
 		this.glTarget = glTarget;
-		this.glHandle = glHandle;
+		this.setGlHandle2(glHandle);
 	}
 
 	/** @return whether this texture is managed or not. */
@@ -74,14 +74,15 @@ public abstract class GLTexture implements Disposable {
 	/** Binds this texture. The texture will be bound to the currently active texture unit specified via
 	 * {@link GL20#glActiveTexture(int)}. */
 	public void bind () {
-		Gdx.gl.glBindTexture(glTarget, glHandle);
+		Gdx.gl.glBindTexture(glTarget, getGlHandle2());
 	}
 
 	/** Binds the texture to the given texture unit. Sets the currently active texture unit via {@link GL20#glActiveTexture(int)}.
 	 * @param unit the unit (0 to MAX_TEXTURE_UNITS). */
 	public void bind (int unit) {
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0 + unit);
-		Gdx.gl.glBindTexture(glTarget, glHandle);
+        Integer tmp = new Integer(getGlHandle2());
+		Gdx.gl.glBindTexture(glTarget, tmp);
 	}
 
 	/** @return The {@link Texture.TextureFilter} used for minification. */
@@ -106,7 +107,7 @@ public abstract class GLTexture implements Disposable {
 
 	/** @return The OpenGL handle for this texture. */
 	public int getTextureObjectHandle () {
-		return glHandle;
+		return getGlHandle2();
 	}
 
 	/** Sets the {@link TextureWrap} for this texture on the u and v axis. Assumes the texture is bound and active!
@@ -177,12 +178,12 @@ public abstract class GLTexture implements Disposable {
 
 	/** Destroys the OpenGL Texture as specified by the glHandle. */
 	protected void delete () {
-		if (glHandle != 0) {
-			buffer.put(0, glHandle);
+		if (getGlHandle2() != 0) {
+			buffer.put(0, getGlHandle2());
 			buffer.position(0);
 			buffer.limit(1);
 			Gdx.gl.glDeleteTextures(1, buffer);
-			glHandle = 0;
+			setGlHandle2(0);
 		}
 	}
 
@@ -205,7 +206,8 @@ public abstract class GLTexture implements Disposable {
 		buffer.position(0);
 		buffer.limit(buffer.capacity());
 		Gdx.gl.glGenTextures(1, buffer);
-		return buffer.get(0);
+        Integer tmp = new Integer(buffer.get(0));
+		return tmp;
 	}
 	
 	protected static void uploadImageData (int target, TextureData data) {
@@ -250,4 +252,12 @@ public abstract class GLTexture implements Disposable {
 		}
 		if (disposePixmap) pixmap.dispose();
 	}
+
+    public void setGlHandle2(int glHandle2) {
+        this.glHandle2 = glHandle2;
+    }
+
+    public int getGlHandle2() {
+        return glHandle2;
+    }
 }
