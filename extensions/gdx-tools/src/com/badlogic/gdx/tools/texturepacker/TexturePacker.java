@@ -101,7 +101,7 @@ public class TexturePacker {
 
 			Array<Page> pages = packer.pack(imageProcessor.getImages());
 
-			String scaledPackFileName = settings.scaledPackFileName(packFileName, i);
+			String scaledPackFileName = settings.getScaledPackFileName(packFileName, i);
 			File packFile = new File(outputDir, scaledPackFileName);
 			File packDir = packFile.getParentFile();
 			packDir.mkdirs();
@@ -119,7 +119,7 @@ public class TexturePacker {
 	private void writeImages (File packFile, Array<Page> pages) {
 		File packDir = packFile.getParentFile();
 		String imageName = packFile.getName();
-		int dotIndex = imageName.indexOf('.');
+		int dotIndex = imageName.lastIndexOf('.');
 		if (dotIndex != -1) imageName = imageName.substring(0, dotIndex);
 
 		int fileIndex = 0;
@@ -577,7 +577,7 @@ public class TexturePacker {
 			scaleSuffix = settings.scaleSuffix;
 		}
 
-		String scaledPackFileName (String packFileName, int scaleIndex) {
+		public String getScaledPackFileName (String packFileName, int scaleIndex) {
 			String extension = "";
 			int dotIndex = packFileName.lastIndexOf('.');
 			if (dotIndex != -1) {
