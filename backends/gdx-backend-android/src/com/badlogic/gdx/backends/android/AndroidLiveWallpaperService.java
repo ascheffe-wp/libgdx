@@ -223,6 +223,8 @@ public abstract class AndroidLiveWallpaperService extends WallpaperService {
 		protected int engineWidth;
 		protected int engineHeight;
 
+        public boolean blockAllTouch = false;
+
 		// lifecycle methods - the order of calling (flow) is maintained /////////////////
 
 		public AndroidWallpaperEngine () {
@@ -487,7 +489,7 @@ public abstract class AndroidLiveWallpaperService extends WallpaperService {
 
 		@Override
 		public void onTouchEvent (MotionEvent event) {
-			if (linkedEngine == this) {
+			if (linkedEngine == this && !blockAllTouch) {
 				app.input.onTouch(null, event);
 			}
 		}
