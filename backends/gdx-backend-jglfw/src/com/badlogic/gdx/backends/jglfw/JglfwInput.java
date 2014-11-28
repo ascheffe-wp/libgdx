@@ -37,6 +37,7 @@ import javax.swing.event.DocumentListener;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.InputProcessorQueue;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.jglfw.GlfwCallbackAdapter;
@@ -102,7 +103,7 @@ public class JglfwInput implements Input {
 
 			public boolean mouseMoved (int screenX, int screenY) {
 				deltaX = screenX - mouseX;
-				deltaY = screenY - mouseX;
+				deltaY = screenY - mouseY;
 				mouseX = screenX;
 				mouseY = screenY;
 				app.graphics.requestRendering();
@@ -124,6 +125,8 @@ public class JglfwInput implements Input {
 	}
 
 	public void update () {
+		deltaX = 0;
+		deltaY = 0;
 		justTouched = false;
 		if (keyJustPressed) {
 			keyJustPressed = false;
@@ -206,7 +209,7 @@ public class JglfwInput implements Input {
 			return glfwGetKey(app.graphics.window, GLFW_KEY_LEFT_SUPER) || glfwGetKey(app.graphics.window, GLFW_KEY_RIGHT_SUPER);
 		return glfwGetKey(app.graphics.window, getJglfwKeyCode(key));
 	}
-	
+
 	@Override
 	public boolean isKeyJustPressed (int key) {
 		if (key == Input.Keys.ANY_KEY) {
@@ -252,7 +255,7 @@ public class JglfwInput implements Input {
 	public void setCatchBackKey (boolean catchBack) {
 	}
 
-	public boolean isCatchBackKey() {
+	public boolean isCatchBackKey () {
 		return false;
 	}
 
@@ -295,23 +298,7 @@ public class JglfwInput implements Input {
 	public void setCursorImage (Pixmap pixmap, int xHotspot, int yHotspot) {
 	}
 
-	public void getTextInput (final TextInputListener listener, final String title, final String text) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run () {
-				final String output = JOptionPane.showInputDialog(null, title, text);
-				app.postRunnable(new Runnable() {
-					public void run () {
-						if (output != null)
-							listener.input(output);
-						else
-							listener.canceled();
-					}
-				});
-			}
-		});
-	}
-
-	public void getPlaceholderTextInput (final TextInputListener listener, final String title, final String placeholder) {
+	public void getTextInput (final TextInputListener listener, final String title, final String text, final String hint) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run () {
 				JPanel panel = new JPanel(new FlowLayout());
@@ -325,10 +312,11 @@ public class JglfwInput implements Input {
 				panel.add(textPanel);
 
 				final JTextField textField = new JTextField(20);
+				textField.setText(text);
 				textField.setAlignmentX(0.0f);
 				textPanel.add(textField);
 
-				final JLabel placeholderLabel = new JLabel(placeholder);
+				final JLabel placeholderLabel = new JLabel(hint);
 				placeholderLabel.setForeground(Color.GRAY);
 				placeholderLabel.setAlignmentX(0.0f);
 				textPanel.add(placeholderLabel, 0);
@@ -378,7 +366,7 @@ public class JglfwInput implements Input {
 			}
 		});
 	}
-
+	
 	static char characterForKeyCode (int key) {
 		// Map certain key codes to character codes.
 		switch (key) {
@@ -860,13 +848,25 @@ public class JglfwInput implements Input {
 			processor.scrolled((int)-Math.signum(scrollY));
 		}
 
+		private int toGdxButton (int button) {
+			if (button == 0) return Buttons.LEFT;
+			if (button == 1) return Buttons.RIGHT;
+			if (button == 2) return Buttons.MIDDLE;
+			if (button == 3) return Buttons.BACK;
+			if (button == 4) return Buttons.FORWARD;
+			return -1;
+		}
+
 		public void mouseButton (long window, int button, boolean pressed) {
+			int gdxButton = toGdxButton(button);
+			if (button != -1 && gdxButton == -1) return; // Ignore unknown button.
+
 			if (pressed) {
 				mousePressed++;
-				processor.touchDown(mouseX, mouseY, 0, button);
+				processor.touchDown(mouseX, mouseY, 0, gdxButton);
 			} else {
 				mousePressed = Math.max(0, mousePressed - 1);
-				processor.touchUp(mouseX, mouseY, 0, button);
+				processor.touchUp(mouseX, mouseY, 0, gdxButton);
 			}
 		}
 
