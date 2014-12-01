@@ -33,6 +33,12 @@ uniform vec4 u_diffuseUVTransform;
 varying vec2 v_diffuseUV;
 #endif
 
+#ifdef videoTextureFlag
+uniform vec4 u_diffuseUVTransform;
+varying vec2 v_diffuseUV;
+attribute vec2 a_texCoord0;
+#endif
+
 #ifdef specularTextureFlag
 uniform vec4 u_specularUVTransform;
 varying vec2 v_specularUV;
@@ -185,7 +191,9 @@ varying vec3 v_ambientLight;
 #endif // lightingFlag
 
 void main() {
-	#ifdef diffuseTextureFlag
+    #if defined(videoTextureFlag)
+        v_diffuseUV = a_texCoord0;
+	#elif defined(diffuseTextureFlag)
 		v_diffuseUV = u_diffuseUVTransform.xy + a_texCoord0 * u_diffuseUVTransform.zw;
 	#endif //diffuseTextureFlag
 	
@@ -237,7 +245,7 @@ void main() {
 	#else
 		vec4 pos = u_worldTrans * vec4(a_position, 1.0);
 	#endif
-		
+
 	gl_Position = u_projViewTrans * pos;
 		
 	#ifdef shadowMapFlag

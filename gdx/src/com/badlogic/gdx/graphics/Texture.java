@@ -116,11 +116,17 @@ public class Texture extends GLTexture {
 		this(new PixmapTextureData(new Pixmap(width, height, format), null, false, true));
 	}
 
-	public Texture (TextureData data) {
-		super(GL20.GL_TEXTURE_2D, createGLHandle());
+	public Texture (int glTarget, TextureData data) {
+		super(glTarget, createGLHandle());
 		load(data);
 		if (data.isManaged()) addManagedTexture(Gdx.app, this);
 	}
+
+    public Texture (TextureData data) {
+        super(GL20.GL_TEXTURE_2D, createGLHandle());
+        load(data);
+        if (data.isManaged()) addManagedTexture(Gdx.app, this);
+    }
 
 	public void load (TextureData data) {
 		if (this.data != null && data.isManaged() != this.data.isManaged())

@@ -1,4 +1,8 @@
-#ifdef GL_ES 
+#if defined(videoTextureFlag)
+#extension GL_OES_EGL_image_external : require
+#endif
+
+#ifdef GL_ES
 #define LOWP lowp
 #define MED mediump
 #define HIGH highp
@@ -104,12 +108,19 @@ uniform vec4 u_fogColor;
 varying float v_fog;
 #endif // fogFlag
 
+#ifdef videoTextureFlag
+uniform samplerExternalOES u_videoTexture;
+varying MED vec2 v_diffuseUV;
+#endif
+
 void main() {
 	#if defined(normalFlag) 
 		vec3 normal = v_normal;
 	#endif // normalFlag
-		
-	#if defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
+
+    #if defined(videoTextureFlag)
+		vec4 diffuse =  texture2D(u_videoTexture, v_diffuseUV);
+	#elif defined(diffuseTextureFlag) && defined(diffuseColorFlag) && defined(colorFlag)
 		vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV) * u_diffuseColor * v_color;
 	#elif defined(diffuseTextureFlag) && defined(diffuseColorFlag)
 		vec4 diffuse = texture2D(u_diffuseTexture, v_diffuseUV) * u_diffuseColor;

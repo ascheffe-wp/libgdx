@@ -616,6 +616,11 @@ public class DefaultShader extends BaseShader {
 			prefix += "#define " + TextureAttribute.DiffuseAlias + "Flag\n";
 			prefix += "#define " + TextureAttribute.DiffuseAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
 		}
+        if ((mask & TextureAttribute.Video) == TextureAttribute.Video) {
+            prefix += "#define " + TextureAttribute.VideoAlias + "Flag\n";
+//            prefix += "#define " + TextureAttribute.DiffuseAlias + "Flag\n";
+//            prefix += "#define " + TextureAttribute.DiffuseAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
+        }
 		if ((mask & TextureAttribute.Specular) == TextureAttribute.Specular) {
 			prefix += "#define " + TextureAttribute.SpecularAlias + "Flag\n";
 			prefix += "#define " + TextureAttribute.SpecularAlias + "Coord texCoord0\n"; // FIXME implement UV mapping
